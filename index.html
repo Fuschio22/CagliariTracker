@@ -1,50 +1,155 @@
 <!DOCTYPE html>
 <html lang="it">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MatchPulse</title>
 
-<title>MatchPulse</title>
-
-<link rel="stylesheet" href="css/style.css">
-
+    <link rel="stylesheet" href="css/style.css">
 </head>
 
 <body>
 
-<div id="popup">
+    <header class="topbar">
+        <div>
+            <h1>⚽ MatchPulse</h1>
+            <p>Segui il calcio in tempo reale</p>
+        </div>
 
-<div class="live">
+        <button class="settings-btn">⚙️</button>
+    </header>
 
-🔴 LIVE
+    <main>
 
-<span id="minute">
-Pre-Partita
-</span>
+        <!-- PARTITA IN EVIDENZA -->
 
-</div>
+        <section class="featured-card">
 
-<div class="teams">
+            <div class="live-badge">
+                🔴 LIVE
+            </div>
 
-<span>🇫🇷 Francia</span>
+            <div class="competition">
+                Coppa del Mondo 2026
+            </div>
 
-<span id="score">
-0 - 0
-</span>
+            <div class="teams">
 
-<span>🇲🇦 Marocco</span>
+                <div class="team">
 
-</div>
+                    <img src="https://flagcdn.com/w160/fr.png">
 
-<div id="event">
+                    <span>Francia</span>
 
-In attesa del calcio d'inizio...
+                </div>
 
-</div>
+                <div class="score">
 
-</div>
+                    <span id="homeScore">0</span>
 
-<script src="js/script.js"></script>
+                    <small>-</small>
+
+                    <span id="awayScore">0</span>
+
+                </div>
+
+                <div class="team">
+
+                    <img src="https://flagcdn.com/w160/ma.png">
+
+                    <span>Marocco</span>
+
+                </div>
+
+            </div>
+
+            <div class="minute">
+
+                <span id="minute">
+                    Pre-Partita
+                </span>
+
+            </div>
+
+            <div class="event">
+
+                <span id="eventText">
+
+                    In attesa del calcio d'inizio...
+
+                </span>
+
+            </div>
+
+            <button id="followButton">
+
+                ⭐ Segui questa partita
+
+            </button>
+
+        </section>
+
+        <!-- LIVE -->
+
+        <section class="list">
+
+            <h2>🔥 Live ora</h2>
+
+            <div class="match-row">
+
+                <span>🇪🇸 Spagna</span>
+
+                <span>21:00</span>
+
+                <span>🇧🇪 Belgio</span>
+
+            </div>
+
+            <div class="match-row">
+
+                <span>🏴 Inghilterra</span>
+
+                <span>23:00</span>
+
+                <span>🇳🇴 Norvegia</span>
+
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- POPUP -->
+
+    <div id="popup">
+
+        <div class="popup-content">
+
+            <div class="popup-live">
+
+                🔴 LIVE
+
+            </div>
+
+            <div class="popup-score">
+
+                Francia 0 - 0 Marocco
+
+            </div>
+
+            <div class="popup-event">
+
+                Nessun evento
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <script src="js/script.js"></script>
 
 </body>
+
 </html>
