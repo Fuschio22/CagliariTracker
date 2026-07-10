@@ -1,134 +1,153 @@
-const homeScore = document.getElementById("homeScore");
-const awayScore = document.getElementById("awayScore");
-const minute = document.getElementById("minute");
-const eventText = document.getElementById("eventText");
+/**
+ * MatchPulse API Module
+ * Handles all data fetching and management
+ * Separated from UI for better maintainability
+ */
 
-const popup = document.getElementById("popup");
-const popupScore = document.querySelector(".popup-score");
-const popupEvent = document.querySelector(".popup-event");
-
-const followButton = document.getElementById("followButton");
-
-let following = false;
-
-followButton.addEventListener("click", () => {
-
-    following = !following;
-
-    if (following) {
-
-        followButton.textContent = "⭐ Partita seguita";
-        followButton.style.background = "#16a34a";
-
-    } else {
-
-        followButton.textContent = "⭐ Segui questa partita";
-        followButton.style.background = "#2d7cff";
-
+const MatchPulseAPI = (() => {
+    // Base URL for API (can be changed for different providers)
+    const API_BASE_URL = 'https://api.football-data.org/v4';
+    const API_KEY = ''; // Add your API key here
+    
+    // Cache for API responses
+    const cache = new Map();
+    const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+    
+    /**
+     * Fetch data from API with caching
+     */
+    async function fetchData(endpoint, options = {}) {
+        const cacheKey = `${endpoint}_${JSON.stringify(options)}`;
+        const cached = cache.get(cacheKey);
+        
+        if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
+            return cached.data;
+        }
+        
+        try {
+            const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+                headers: {
+                    'X-Auth-Token': API_KEY,
+                    'Content-Type': 'application/json'
+                },
+                ...options
+            });
+            
+            if (!response.ok) {
+                throw new Error(`API Error: ${response.status}`);
+            }
+            
+            const data = await response.json();
+            cache.set(cacheKey, { data, timestamp: Date.now() });
+            return data;
+        } catch (error) {
+            console.error('API fetch error:', error);
+            throw error;
+        }
     }
-
-});
-
-function showPopup(score, event) {
-
-    popup.classList.add("show");
-
-    popupScore.textContent = score;
-    popupEvent.textContent = event;
-
-    setTimeout(() => {
-
-        popup.classList.remove("show");
-
-    }, 5000);
-
-}
-
-const timeline = [
-
-    {
-        minute: "Pre-Partita",
-        home: 0,
-        away: 0,
-        event: "Le squadre stanno entrando in campo."
-    },
-
-    {
-        minute: "1'",
-        home: 0,
-        away: 0,
-        event: "⚽ Calcio d'inizio!"
-    },
-
-    {
-        minute: "23'",
-        home: 1,
-        away: 0,
-        event: "⚽ GOL FRANCIA - Mbappé"
-    },
-
-    {
-        minute: "45+2'",
-        home: 1,
-        away: 0,
-        event: "⏸ Fine primo tempo"
-    },
-
-    {
-        minute: "61'",
-        home: 1,
-        away: 0,
-        event: "🟨 Ammonito Hakimi"
-    },
-
-    {
-        minute: "74'",
-        home: 2,
-        away: 0,
-        event: "⚽ GOL FRANCIA - Dembélé"
-    },
-
-    {
-        minute: "89'",
-        home: 2,
-        away: 1,
-        event: "⚽ GOL MAROCCO - En-Nesyri"
-    },
-
-    {
-        minute: "90+5'",
-        home: 2,
-        away: 1,
-        event: "🏁 FINE PARTITA"
+    
+    /**
+     * Get all competitions
+     */
+    async function getCompetitions() {
+        // Mock data for demo - replace with actual API call
+        return [
+            { id: 'SA', name: 'Serie A', country: 'Italy', logo: '🇮🇹' },
+            { id: 'PL', name: 'Premier League', country: 'England', logo: '🏴󠁧󠁢󠁥󠁮󠁧󠁿' },
+            { id: 'CL', name: 'Champions League', country: 'Europe', logo: '🏆' },
+            { id: 'EL', name: 'Europa League', country: 'Europe', logo: '🥈' },
+            { id: 'WC', name: 'Mondiale', country: 'World', logo: '🌍' },
+            { id: 'CI', name: 'Coppa Italia', country: 'Italy', logo: '🏆' }
+        ];
     }
-
-];
-
-let index = 0;
-
-function updateMatch() {
-
-    if (index >= timeline.length)
-        return;
-
-    const item = timeline[index];
-
-    homeScore.textContent = item.home;
-    awayScore.textContent = item.away;
-
-    minute.textContent = item.minute;
-
-    eventText.textContent = item.event;
-
-    showPopup(
-        `Francia ${item.home} - ${item.away} Marocco`,
-        item.event
-    );
-
-    index++;
-
-}
-
-updateMatch();
-
-setInterval(updateMatch, 6000);
+    
+    /**
+     * Get live matches
+     */
+    async function getLiveMatches() {
+        // Mock data for demo
+        return [
+            {
+                id: 'match-1',
+                homeTeam: { name: 'Inter', logo: '⚫', shortName: 'INT' },
+                awayTeam: { name: 'Milan', logo: '🔴', shortName: 'MIL' },
+                score: { home: 2, away: 1 },
+                status: 'LIVE',
+                minute: 67,
+                competition: 'Serie A',
+                stadium: 'San Siro',
+                lastEvent: 'Gol! Lautaro Martinez (67\')'
+            },
+            {
+                id: 'match-2',
+                homeTeam: { name: 'Juventus', logo: '⚪', shortName: 'JUV' },
+                awayTeam: { name: 'Roma', logo: '🟡', shortName: 'ROM' },
+                score: { home: 1, away: 1 },
+                status: 'LIVE',
+                minute: 45,
+                competition: 'Serie A',
+                stadium: 'Allianz Stadium',
+                lastEvent: 'Cartellino giallo (43\')'
+            }
+        ];
+    }
+    
+    /**
+     * Get today's matches
+     */
+    async function getTodayMatches() {
+        // Mock data for demo
+        return [
+            {
+                id: 'match-3',
+                homeTeam: { name: 'Napoli', logo: '🔵', shortName: 'NAP' },
+                awayTeam: { name: 'Lazio', logo: '🦅', shortName: 'LAZ' },
+                score: { home: 0, away: 0 },
+                status: 'SCHEDULED',
+                time: '20:45',
+                competition: 'Serie A',
+                stadium: 'Diego Armando Maradona'
+            },
+            {
+                id: 'match-4',
+                homeTeam: { name: 'Atalanta', logo: '⚡', shortName: 'ATA' },
+                awayTeam: { name: 'Fiorentina', logo: '🟣', shortName: 'FIO' },
+                score: { home: 0, away: 0 },
+                status: 'SCHEDULED',
+                time: '18:30',
+                competition: 'Serie A',
+                stadium: 'Gewiss Stadium'
+            }
+        ];
+    }
+    
+    /**
+     * Get featured match
+     */
+    async function getFeaturedMatch() {
+        const liveMatches = await getLiveMatches();
+        return liveMatches[0] || null;
+    }
+    
+    /**
+     * Get match details
+     */
+    async function getMatchDetails(matchId) {
+        // Mock data for demo
+        return {
+            id: matchId,
+            homeTeam: { 
+                name: 'Inter', 
+                logo: '⚫', 
+                shortName: 'INT',
+                formation: '3-5-2',
+                lineup: ['Handanovic', 'Bastoni', 'De Vrij', 'Scriniar', 'Dimarco', 'Barella', 'Calhanoglu', 'Mkhitaryan', 'Darmian', 'Lautaro', 'Dzeko'],
+                subs: ['Onana', 'Bellanova', 'Correa']
+            },
+            awayTeam: { 
+                name: 'Milan', 
+                logo: '🔴', 
+                shortName: 'MIL',
+                formation: '4-3-3',
+                lineup: ['Maignan', 'Calabria', 'Tomori', 'Kjaer', 'Theo', 'Tonali', 'Bennacer', 'Diaz', 'Saelemaekers', 'Giroud', 'Leao'],
+                subs: ['Tatarusanu', 'Kalulu', 'Origi
