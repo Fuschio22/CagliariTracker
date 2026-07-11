@@ -7,7 +7,7 @@ const MatchPulseAPI = (() => {
     const API_KEY = 'cdd1a87ea50a411880249e70138e0233';
     
     const cache = new Map();
-    const CACHE_DURATION = 60 * 1000; // 1 minuto (per risparmiare richieste API)
+    const CACHE_DURATION = 60 * 1000;
     
     async function fetchData(endpoint, options = {}) {
         const cacheKey = endpoint + '_' + JSON.stringify(options);
@@ -48,10 +48,8 @@ const MatchPulseAPI = (() => {
         }
     }
     
-    // NUOVA FUNZIONE: Ottieni la classifica
     async function getStandings(competitionName) {
         try {
-            // Mappa dei codici ufficiali per le classifiche
             const codeMap = {
                 'Serie A': 'SA',
                 'Premier League': 'PL',
@@ -65,11 +63,9 @@ const MatchPulseAPI = (() => {
                 'Championship': 'ELC'
             };
             
-            // Cerca il codice ufficiale
             let officialCode = codeMap[competitionName] || competitionName;
             
             const data = await fetchData('/competitions/' + officialCode + '/standings');
-            // Restituisci la classifica totale (primo standing)
             return data.standings[0].table;
         } catch (error) {
             console.error('Error fetching standings for ' + competitionName + ':', error);
@@ -77,11 +73,31 @@ const MatchPulseAPI = (() => {
         }
     }
     
+    // MODIFICATA: Mostra tutte le partite per Mondiale
     async function getCompetitionMatches(competitionCode, competitionName) {
         try {
             const today = new Date().toISOString().split('T')[0];
             const data = await fetchData('/matches?dateFrom=' + today + '&dateTo=' + today);
             
+            // Se è "Mondiale" o "World Cup", mostriamo TUTTE le partite di oggi
+            // perché le qualificazioni hanno codici diversi
+            if (competitionName && competitionName.toLowerCase().includes('mondiale')) {
+                console.log('Mostrando tutte le partite di oggi per Mondiale');
+                return data.matches.map(match => ({
+                    id: match.id,
+                    homeTeam: { name: match.homeTeam.name, logo: getTeamLogo(match.homeTeam.shortName), shortName: match.homeTeam.shortName },
+                    awayTeam: { name: match.awayTeam.name, logo: getTeamLogo(match.awayTeam.shortName), shortName: match.awayTeam.shortName },
+                    score: { home: match.score.fullTime.home || match.score.halfTime.home || 0, away: match.score.fullTime.away || match.score.halfTime.away || 0 },
+                    status: match.status,
+                    minute: match.minute || 0,
+                    time: new Date(match.utcDate).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' }),
+                    competition: match.competition.name,
+                    stadium: match.venue || 'N/A',
+                    lastEvent: getLastEvent(match)
+                }));
+            }
+            
+            // Per altri campionati, applica il filtro normale
             const filteredMatches = data.matches.filter(match => {
                 if (match.competition.id == competitionCode) return true;
                 const apiName = match.competition.name.toLowerCase();
@@ -245,6 +261,6 @@ const MatchPulseAPI = (() => {
         searchTeams: searchTeams,
         findSpecificMatch: findSpecificMatch,
         getCompetitionMatches: getCompetitionMatches,
-        getStandings: getStandings // NUOVA FUNZIONE ESPOSTA
+        getStandings: getStandings
     };
 })();
