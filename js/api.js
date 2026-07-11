@@ -74,15 +74,26 @@ const MatchPulseAPI = (() => {
     }
     
     // MODIFICATA: Mostra tutte le partite per Mondiale
-    async function getCompetitionMatches(competitionCode, competitionName) {
+        async function getCompetitionMatches(competitionCode, competitionName) {
         try {
             const today = new Date().toISOString().split('T')[0];
+            console.log('📅 Data oggi:', today);
+            
             const data = await fetchData('/matches?dateFrom=' + today + '&dateTo=' + today);
             
-            // Se è "Mondiale" o "World Cup", mostriamo TUTTE le partite di oggi
-            // perché le qualificazioni hanno codici diversi
+            console.log('📊 Partite trovate:', data.matches ? data.matches.length : 0);
+            
+            if (data.matches && data.matches.length > 0) {
+                console.log('📋 Prima partita:', data.matches[0].homeTeam.name, 'vs', data.matches[0].awayTeam.name);
+            }
+            
             if (competitionName && competitionName.toLowerCase().includes('mondiale')) {
-                console.log('Mostrando tutte le partite di oggi per Mondiale');
+                console.log('✅ Mostro tutte le partite per Mondiale');
+                
+                if (!data.matches || data.matches.length === 0) {
+                    console.warn('⚠️ Nessuna partita oggi dall\'API');
+                }
+                
                 return data.matches.map(match => ({
                     id: match.id,
                     homeTeam: { name: match.homeTeam.name, logo: getTeamLogo(match.homeTeam.shortName), shortName: match.homeTeam.shortName },
@@ -97,6 +108,28 @@ const MatchPulseAPI = (() => {
                 }));
             }
             
+            const filteredMatches = data.matches.filter(match => {
+                if (match.competition.id == competitionCode) return true;
+                return false;
+            });
+
+            return filteredMatches.map(match => ({
+                id: match.id,
+                homeTeam: { name: match.homeTeam.name, logo: getTeamLogo(match.homeTeam.shortName), shortName: match.homeTeam.shortName },
+                awayTeam: { name: match.awayTeam.name, logo: getTeamLogo(match.awayTeam.shortName), shortName: match.awayTeam.shortName },
+                score: { home: match.score.fullTime.home || match.score.halfTime.home || 0, away: match.score.fullTime.away || match.score.halfTime.away || 0 },
+                status: match.status,
+                minute: match.minute || 0,
+                time: new Date(match.utcDate).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' }),
+                competition: match.competition.name,
+                stadium: match.venue || 'N/A',
+                lastEvent: getLastEvent(match)
+            }));
+        } catch (error) {
+            console.error('❌ Errore:', error);
+            return [];
+        }
+             
             // Per altri campionati, applica il filtro normale
             const filteredMatches = data.matches.filter(match => {
                 if (match.competition.id == competitionCode) return true;
