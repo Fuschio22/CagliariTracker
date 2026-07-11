@@ -110,15 +110,14 @@ const MatchPulseUI = (() => {
         } catch (error) { console.error('Error opening match center:', error); }
     }
     
-    // MODIFICATA: Ora mostra i Tab "Partite" e "Classifica"
     async function openCompetition(competitionCode, competitionName) {
         try {
             const matches = await MatchPulseAPI.getCompetitionMatches(competitionCode, competitionName);
             
             elements.matchCenterContent.innerHTML = `
                 <div class="match-center-tabs">
-                    <button class="tab-btn active" id="btn-matches"> Partite</button>
-                    <button class="tab-btn" id="btn-standings"> Classifica</button>
+                    <button class="tab-btn active" id="btn-matches">Partite</button>
+                    <button class="tab-btn" id="btn-standings">Classifica</button>
                 </div>
                 <div id="comp-content">${renderCompetitionContent(competitionName, matches)}</div>
             `;
@@ -127,7 +126,6 @@ const MatchPulseUI = (() => {
             const title = document.querySelector('.match-center-header h2');
             if (title) title.textContent = competitionName;
             
-            // Listener Tab Partite
             document.getElementById('btn-matches').addEventListener('click', () => {
                 document.getElementById('btn-matches').classList.add('active');
                 document.getElementById('btn-standings').classList.remove('active');
@@ -135,7 +133,6 @@ const MatchPulseUI = (() => {
                 document.querySelectorAll('.match-card').forEach(card => card.addEventListener('click', () => openMatchCenter(card.getAttribute('data-match-id'))));
             });
             
-            // Listener Tab Classifica
             document.getElementById('btn-standings').addEventListener('click', async () => {
                 document.getElementById('btn-standings').classList.add('active');
                 document.getElementById('btn-matches').classList.remove('active');
@@ -158,16 +155,15 @@ const MatchPulseUI = (() => {
         
         let html = '<div style="padding: 20px 0;">';
         if (liveMatches.length > 0) { html += '<h3 style="margin-bottom: 16px; color: var(--danger);">🔴 Live Ora</h3><div class="matches-grid" style="margin-bottom: 32px;">'; html += liveMatches.map(m => renderMatchCard(m, true)).join(''); html += '</div>'; }
-        if (scheduledMatches.length > 0) { html += '<h3 style="margin-bottom: 16px;"> In Programma</h3><div class="matches-grid" style="margin-bottom: 32px;">'; html += scheduledMatches.map(m => renderMatchCard(m, false)).join(''); html += '</div>'; }
+        if (scheduledMatches.length > 0) { html += '<h3 style="margin-bottom: 16px;">📅 In Programma</h3><div class="matches-grid" style="margin-bottom: 32px;">'; html += scheduledMatches.map(m => renderMatchCard(m, false)).join(''); html += '</div>'; }
         if (finishedMatches.length > 0) { html += '<h3 style="margin-bottom: 16px; color: var(--text-secondary);">✅ Terminati</h3><div class="matches-grid">'; html += finishedMatches.map(m => renderMatchCard(m, false)).join(''); html += '</div>'; }
         html += '</div>';
         return html;
     }
     
-    // NUOVA FUNZIONE: Renderizza la classifica
     function renderStandingsContent(standings) {
         if (!standings || standings.length === 0) {
-            return '<p style="text-align:center; padding:40px; color: var(--text-secondary);">Classifica non disponibile per questa competizione.</p>';
+            return '<p style="text-align:center; padding:40px; color: var(--text-secondary);">Classifica non disponibile.</p>';
         }
         
         let html = '<div style="padding: 20px 0; overflow-x: auto;">';
@@ -185,8 +181,8 @@ const MatchPulseUI = (() => {
         standings.forEach((team, index) => {
             const position = index + 1;
             let rowColor = '';
-            if (position <= 4) rowColor = 'border-left: 3px solid var(--success);'; // Champions
-            else if (position <= 6) rowColor = 'border-left: 3px solid var(--warning);'; // Europa
+            if (position <= 4) rowColor = 'border-left: 3px solid var(--success);';
+            else if (position <= 6) rowColor = 'border-left: 3px solid var(--warning);';
             
             html += `<tr style="border-bottom: 1px solid var(--border); ${rowColor}">
                 <td style="padding: 12px 8px; font-weight: bold; color: var(--text-secondary);">${position}</td>
@@ -199,12 +195,7 @@ const MatchPulseUI = (() => {
             </tr>`;
         });
         
-        html += '</table>';
-        html += '<div style="margin-top: 20px; font-size: 12px; color: var(--text-tertiary); display: flex; gap: 16px;">';
-        html += '<span style="display: flex; align-items: center; gap: 6px;"><span style="width: 10px; height: 10px; background: var(--success); border-radius: 2px;"></span> Champions</span>';
-        html += '<span style="display: flex; align-items: center; gap: 6px;"><span style="width: 10px; height: 10px; background: var(--warning); border-radius: 2px;"></span> Europa</span>';
-        html += '</div></div>';
-        
+        html += '</table></div>';
         return html;
     }
     
