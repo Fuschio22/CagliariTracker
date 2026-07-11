@@ -313,7 +313,7 @@
     <a href="index.html" style="display: block; text-align: center; margin-top: 30px; color: #00d4ff; text-decoration: none;">← Torna alla Home</a>
     
     <script>
-        const MATCH_TIME = { hour: 23, minute: 0 };
+        const MATCH_TIME = { hour: new Date().getHours(), minute: new Date().getMinutes() };
         
         function updateCountdown() {
             const now = new Date();
