@@ -1,54 +1,30 @@
 <!DOCTYPE html>
-<html lang="it">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MatchPulse - Live Scores</title>
+    <title>MatchPulse - Home</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-    <header class="header">
-        <div class="header-content">
-            <div class="logo">
-                <span class="logo-text">MatchPulse</span>
-            </div>
-            <nav class="nav-menu">
-                <a href="index.html" class="nav-link active">Home</a>
-                <a href="mondiale.html" class="nav-link">Mondiale</a>
-                <a href="champions.html" class="nav-link">Champions</a>
-                <a href="serie-a.html" class="nav-link">Serie A</a>
-            </nav>
+    <h1 style="text-align: center;">⚽ MatchPulse</h1>
+    
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-top: 40px;">
+        <a href="mondiale.html" style="background: #242424; padding: 32px; border-radius: 16px; text-decoration: none; color: white; text-align: center;">
+            <div style="font-size: 48px; margin-bottom: 16px;">🏆</div>
+            <div style="font-size: 20px; font-weight: bold; margin-bottom: 8px;">Mondiale 2026</div>
+            <div style="color: #888;">Norvegia vs Inghilterra - Oggi 23:00</div>
+        </a>
+        
+        <div style="background: #242424; padding: 32px; border-radius: 16px; text-align: center; opacity: 0.5;">
+            <div style="font-size: 48px; margin-bottom: 16px;">⭐</div>
+            <div style="font-size: 20px; font-weight: bold; margin-bottom: 8px;">Champions League</div>
+            <div style="color: #888;">Prossimamente...</div>
         </div>
-    </header>
-
-    <main class="main-content">
-        <section class="competitions-grid">
-            <a href="mondiale.html" class="competition-card">
-                <div class="competition-logo">🏆</div>
-                <div class="competition-name">FIFA World Cup</div>
-                <div class="competition-info">Norvegia vs Inghilterra - Oggi 23:00</div>
-            </a>
-            
-            <a href="champions.html" class="competition-card">
-                <div class="competition-logo">⭐</div>
-                <div class="competition-name">Champions League</div>
-                <div class="competition-info">Prossime partite in programma</div>
-            </a>
-            
-            <a href="serie-a.html" class="competition-card">
-                <div class="competition-logo">🇮🇹</div>
-                <div class="competition-name">Serie A</div>
-                <div class="competition-info">Calendario completo</div>
-            </a>
-            
-            <a href="premier-league.html" class="competition-card">
-                <div class="competition-logo">🏴󠁢󠁮󠁧</div>
-                <div class="competition-name">Premier League</div>
-                <div class="competition-info">Classifica e risultati</div>
-            </a>
-        </section>
-    </main>
-
-    <script src="js/main.js"></script>
+        
+        <div style="background: #242424; padding: 32px; border-radius: 16px; text-align: center; opacity: 0.5;">
+            <div style="font-size: 48px; margin-bottom: 16px;">🇮🇹</div>
+            <div style="font-size: 20px; font-weight: bold; margin-bottom: 8px;">Serie A</div>
+            <div style="color: #888;">Prossimamente...</div>
+        </div>
+    </div>
 </body>
 </html>
