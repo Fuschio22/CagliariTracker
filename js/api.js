@@ -1,5 +1,5 @@
 /**
- * MatchPulse API Module - REAL API Integration
+ * MatchPulse API Module
  */
 
 const MatchPulseAPI = (() => {
@@ -48,55 +48,12 @@ const MatchPulseAPI = (() => {
         }
     }
     
-    async function getStandings(competitionName) {
-        try {
-            const codeMap = {
-                'Serie A': 'SA',
-                'Premier League': 'PL',
-                'Champions League': 'CL',
-                'Europa League': 'EL',
-                'Bundesliga': 'BL1',
-                'Ligue 1': 'FL1',
-                'Primera Division': 'PD',
-                'Eredivisie': 'DED',
-                'Primeira Liga': 'PPL',
-                'Championship': 'ELC'
-            };
-            
-            let officialCode = codeMap[competitionName] || competitionName;
-            
-            const data = await fetchData('/competitions/' + officialCode + '/standings');
-            return data.standings[0].table;
-        } catch (error) {
-            console.error('Error fetching standings for ' + competitionName + ':', error);
-            return [];
-        }
-    }
-    
     async function getCompetitionMatches(competitionCode, competitionName) {
         try {
             const today = new Date().toISOString().split('T')[0];
-            console.log('DATA OGGI:', today);
-            console.log('COMPETIZIONE:', competitionName);
-            
             const data = await fetchData('/matches?dateFrom=' + today + '&dateTo=' + today);
             
-            console.log('TOTALE PARTITE RICEVUTE:', data.matches ? data.matches.length : 0);
-            
-            if (data.matches && data.matches.length > 0) {
-                console.log('PRIME 3 PARTITE:');
-                data.matches.slice(0, 3).forEach(m => {
-                    console.log('  - ' + m.homeTeam.name + ' vs ' + m.awayTeam.name + ' (' + m.competition.name + ')');
-                });
-            }
-            
             if (competitionName && competitionName.toLowerCase().includes('mondiale')) {
-                console.log('MOSTRO TUTTE LE PARTITE PER MONDIALE');
-                
-                if (!data.matches || data.matches.length === 0) {
-                    console.warn('NESSUNA PARTITA OGGI DALL API');
-                }
-                
                 return data.matches.map(match => ({
                     id: match.id,
                     homeTeam: { name: match.homeTeam.name, logo: getTeamLogo(match.homeTeam.shortName), shortName: match.homeTeam.shortName },
@@ -134,7 +91,7 @@ const MatchPulseAPI = (() => {
                 lastEvent: getLastEvent(match)
             }));
         } catch (error) {
-            console.error('ERRORE:', error);
+            console.error('Error fetching competition matches:', error);
             return [];
         }
     }
@@ -273,7 +230,6 @@ const MatchPulseAPI = (() => {
         getMatchDetails: getMatchDetails,
         searchTeams: searchTeams,
         findSpecificMatch: findSpecificMatch,
-        getCompetitionMatches: getCompetitionMatches,
-        getStandings: getStandings
+        getCompetitionMatches: getCompetitionMatches
     };
 })();
