@@ -1,30 +1,384 @@
 <!DOCTYPE html>
-<html>
+<html lang="it">
 <head>
-    <title>MatchPulse - Home</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#c8102e">
+    <title>Cagliari Tracker - Serie A</title>
     <link rel="stylesheet" href="css/style.css">
+    <style>
+        :root {
+            --cagliari-red: #c8102e;
+            --cagliari-blue: #003da5;
+            --bg-primary: #0a0a0a;
+            --bg-card: #1a1a1a;
+            --text-primary: #ffffff;
+            --text-secondary: rgba(255,255,255,0.7);
+            --accent: #c8102e;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            padding: 20px;
+            padding-bottom: 100px;
+        }
+        .header {
+            text-align: center;
+            padding: 20px 0;
+            border-bottom: 2px solid var(--cagliari-red);
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            font-size: 28px;
+            background: linear-gradient(135deg, var(--cagliari-red), var(--cagliari-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .header p {
+            color: var(--text-secondary);
+            margin-top: 8px;
+            font-size: 14px;
+        }
+        .next-match {
+            background: linear-gradient(135deg, rgba(200,16,46,0.2), rgba(0,61,165,0.2));
+            border: 2px solid var(--cagliari-red);
+            border-radius: 16px;
+            padding: 32px 24px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .next-match-label {
+            color: var(--cagliari-red);
+            font-weight: 700;
+            font-size: 14px;
+            margin-bottom: 16px;
+            text-transform: uppercase;
+        }
+        .next-match-teams {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            margin: 20px 0;
+        }
+        .team {
+            flex: 1;
+            text-align: center;
+        }
+        .team-logo {
+            font-size: 48px;
+            margin-bottom: 8px;
+        }
+        .team-name {
+            font-weight: 700;
+            font-size: 16px;
+        }
+        .vs {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--cagliari-red);
+        }
+        .match-info {
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin-top: 16px;
+        }
+        .countdown {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            margin-top: 20px;
+        }
+        .countdown-timer {
+            font-size: 36px;
+            font-weight: 800;
+            color: var(--cagliari-red);
+        }
+        .section-title {
+            font-size: 20px;
+            margin: 30px 0 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid rgba(255,255,255,0.1);
+        }
+        .match-card {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            border-left: 4px solid var(--cagliari-red);
+        }
+        .match-card-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+        }
+        .match-card-teams {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .match-card-team {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex: 1;
+        }
+        .match-card-team.away {
+            justify-content: flex-end;
+        }
+        .match-card-score {
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--cagliari-red);
+            min-width: 60px;
+            text-align: center;
+        }
+        .status-live {
+            color: #ff3366;
+            font-weight: 700;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        .nav-links {
+            display: flex;
+            gap: 12px;
+            margin-top: 30px;
+        }
+        .nav-link {
+            flex: 1;
+            background: var(--bg-card);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            text-decoration: none;
+            color: var(--text-primary);
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        .nav-link:hover {
+            background: var(--cagliari-red);
+            border-color: var(--cagliari-red);
+        }
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-secondary);
+        }
+        .error {
+            background: rgba(255,51,102,0.1);
+            border: 1px solid #ff3366;
+            border-radius: 12px;
+            padding: 16px;
+            margin: 20px 0;
+            text-align: center;
+            color: #ff3366;
+        }
+        .notification-banner {
+            background: linear-gradient(135deg, var(--cagliari-red), var(--cagliari-blue));
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .notification-banner button {
+            background: white;
+            color: var(--cagliari-red);
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 700;
+            margin-top: 12px;
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
-    <h1 style="text-align: center;">⚽ MatchPulse</h1>
-    
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-top: 40px;">
-        <a href="mondiale.html" style="background: #242424; padding: 32px; border-radius: 16px; text-decoration: none; color: white; text-align: center;">
-            <div style="font-size: 48px; margin-bottom: 16px;">🏆</div>
-            <div style="font-size: 20px; font-weight: bold; margin-bottom: 8px;">Mondiale 2026</div>
-            <div style="color: #888;">Norvegia vs Inghilterra - Oggi 23:00</div>
-        </a>
-        
-        <div style="background: #242424; padding: 32px; border-radius: 16px; text-align: center; opacity: 0.5;">
-            <div style="font-size: 48px; margin-bottom: 16px;">⭐</div>
-            <div style="font-size: 20px; font-weight: bold; margin-bottom: 8px;">Champions League</div>
-            <div style="color: #888;">Prossimamente...</div>
-        </div>
-        
-        <div style="background: #242424; padding: 32px; border-radius: 16px; text-align: center; opacity: 0.5;">
-            <div style="font-size: 48px; margin-bottom: 16px;">🇮🇹</div>
-            <div style="font-size: 20px; font-weight: bold; margin-bottom: 8px;">Serie A</div>
-            <div style="color: #888;">Prossimamente...</div>
-        </div>
+    <div class="header">
+        <h1>🔴 Cagliari Tracker</h1>
+        <p>Serie A 2024/25 - Tutti gli aggiornamenti</p>
     </div>
+
+    <!-- Notifiche -->
+    <div class="notification-banner" id="notifBanner">
+        <div style="font-weight: 700; margin-bottom: 8px;"> Ricevi notifiche live</div>
+        <div style="font-size: 14px; opacity: 0.9;">Avvisi quando il Cagliari gioca</div>
+        <button onclick="enableNotifications()">Attiva Notifiche</button>
+    </div>
+
+    <!-- Prossima Partita -->
+    <div class="next-match" id="nextMatch">
+        <div class="loading">Caricamento prossima partita...</div>
+    </div>
+
+    <!-- Ultime Partite -->
+    <h2 class="section-title">Ultime Partite</h2>
+    <div id="recentMatches">
+        <div class="loading">Caricamento...</div>
+    </div>
+
+    <!-- Navigazione -->
+    <div class="nav-links">
+        <a href="partite.html" class="nav-link">📅 Calendario</a>
+        <a href="classifica.html" class="nav-link">🏆 Classifica</a>
+    </div>
+
+    <script>
+        const API_KEY = 'cdd1a87ea50a411880249e70138e0233';
+        const API_BASE = 'https://api.football-data.org/v4';
+        const CAGLIARI_ID = 115;
+        const SERIE_A_CODE = 'SA';
+
+        // Carica prossima partita
+        async function loadNextMatch() {
+            try {
+                const response = await fetch(`${API_BASE}/teams/${CAGLIARI_ID}/matches?status=SCHEDULED`, {
+                    headers: { 'X-Auth-Token': API_KEY }
+                });
+                const data = await response.json();
+                
+                if (data.matches && data.matches.length > 0) {
+                    const match = data.matches[0];
+                    const matchDate = new Date(match.utcDate);
+                    const now = new Date();
+                    const diff = matchDate - now;
+                    
+                    const hours = Math.floor(diff / (1000 * 60 * 60));
+                    const days = Math.floor(hours / 24);
+                    
+                    document.getElementById('nextMatch').innerHTML = `
+                        <div class="next-match-label">Prossima Partita</div>
+                        <div class="next-match-teams">
+                            <div class="team">
+                                <div class="team-logo">${match.homeTeam.shortName === 'CAG' ? '🔵' : '⚽'}</div>
+                                <div class="team-name">${match.homeTeam.name}</div>
+                            </div>
+                            <div class="vs">VS</div>
+                            <div class="team">
+                                <div class="team-logo">${match.awayTeam.shortName === 'CAG' ? '🔵' : '⚽'}</div>
+                                <div class="team-name">${match.awayTeam.name}</div>
+                            </div>
+                        </div>
+                        <div class="match-info">
+                            ${matchDate.toLocaleDateString('it-IT', { weekday: 'long', day: 'numeric', month: 'long' })} • ${matchDate.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' })}<br>
+                            ${match.venue || 'Stadio da definire'}
+                        </div>
+                        <div class="countdown">
+                            <div style="font-size: 14px; color: var(--text-secondary); margin-bottom: 8px;">Inizia tra:</div>
+                            <div class="countdown-timer">${days > 0 ? days + 'g ' : ''}${hours % 24}h ${Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))}m</div>
+                        </div>
+                    `;
+                    
+                    // Programma notifica
+                    scheduleMatchNotification(match);
+                } else {
+                    document.getElementById('nextMatch').innerHTML = '<div class="loading">Nessuna partita in programma</div>';
+                }
+            } catch (error) {
+                document.getElementById('nextMatch').innerHTML = '<div class="error">Errore nel caricamento. Riprova più tardi.</div>';
+            }
+        }
+
+        // Carica ultime partite
+        async function loadRecentMatches() {
+            try {
+                const response = await fetch(`${API_BASE}/teams/${CAGLIARI_ID}/matches?status=FINISHED&limit=5`, {
+                    headers: { 'X-Auth-Token': API_KEY }
+                });
+                const data = await response.json();
+                
+                if (data.matches && data.matches.length > 0) {
+                    const html = data.matches.slice(0, 5).map(match => {
+                        const matchDate = new Date(match.utcDate);
+                        const isHome = match.homeTeam.id === CAGLIARI_ID;
+                        const cagliariScore = isHome ? match.score.fullTime.home : match.score.fullTime.away;
+                        const opponentScore = isHome ? match.score.fullTime.away : match.score.fullTime.home;
+                        const opponent = isHome ? match.awayTeam : match.homeTeam;
+                        const result = cagliariScore > opponentScore ? 'V' : (cagliariScore < opponentScore ? 'S' : 'P');
+                        const resultColor = result === 'V' ? '#00ff88' : (result === 'S' ? '#ff3366' : '#ffaa00');
+                        
+                        return `
+                            <div class="match-card">
+                                <div class="match-card-header">
+                                    <span>${match.competition.name}</span>
+                                    <span>${matchDate.toLocaleDateString('it-IT', { day: 'numeric', month: 'short' })}</span>
+                                </div>
+                                <div class="match-card-teams">
+                                    <div class="match-card-team">
+                                        <span style="font-size: 20px;">${isHome ? '🔴' : '⚽'}</span>
+                                        <span>${match.homeTeam.shortName}</span>
+                                    </div>
+                                    <div class="match-card-score">${match.score.fullTime.home} - ${match.score.fullTime.away}</div>
+                                    <div class="match-card-team away">
+                                        <span>${match.awayTeam.shortName}</span>
+                                        <span style="font-size: 20px;">${!isHome ? '🔴🔵' : '⚽'}</span>
+                                    </div>
+                                </div>
+                                <div style="text-align: center; margin-top: 8px;">
+                                    <span style="background: ${resultColor}; color: white; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 700;">${result}</span>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+                    
+                    document.getElementById('recentMatches').innerHTML = html;
+                } else {
+                    document.getElementById('recentMatches').innerHTML = '<div class="loading">Nessuna partita recente</div>';
+                }
+            } catch (error) {
+                document.getElementById('recentMatches').innerHTML = '<div class="error">Errore nel caricamento</div>';
+            }
+        }
+
+        // Notifiche
+        function enableNotifications() {
+            if ('Notification' in window) {
+                Notification.requestPermission().then(permission => {
+                    if (permission === 'granted') {
+                        document.getElementById('notifBanner').style.display = 'none';
+                        localStorage.setItem('cagliariNotif', 'true');
+                        alert('✅ Notifiche attivate! Riceverai avvisi per le partite del Cagliari.');
+                    }
+                });
+            }
+        }
+
+        function scheduleMatchNotification(match) {
+            if (localStorage.getItem('cagliariNotif') !== 'true') return;
+            if (!('Notification' in window) || Notification.permission !== 'granted') return;
+            
+            const matchDate = new Date(match.utcDate);
+            const now = new Date();
+            const diff = matchDate - now;
+            
+            // Notifica 1 ora prima
+            if (diff > 0 && diff < 24 * 60 * 60 * 1000) {
+                setTimeout(() => {
+                    new Notification('🔴🔵 Cagliari', {
+                        body: `${match.homeTeam.name} vs ${match.awayTeam.name}\nInizia tra 1 ora!`,
+                        icon: 'https://upload.wikimedia.org/wikipedia/en/thumb/0/0e/Cagliari_Calcio_1920.svg/200px-Cagliari_Calcio_1920.svg.png'
+                    });
+                }, diff - 3600000);
+            }
+        }
+
+        // Inizializza
+        loadNextMatch();
+        loadRecentMatches();
+        
+        // Aggiorna ogni 5 minuti
+        setInterval(() => {
+            loadNextMatch();
+            loadRecentMatches();
+        }, 300000);
+    </script>
 </body>
 </html>
