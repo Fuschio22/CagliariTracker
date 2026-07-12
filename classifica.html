@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Classifica Serie A - Cagliari Tracker</title>
+    <style>
+        :root {
+            --cagliari-red: #c8102e;
+            --cagliari-blue: #003da5;
+            --bg-primary: #0a0a0a;
+            --bg-card: #1a1a1a;
+            --text-primary: #ffffff;
+            --text-secondary: rgba(255,255,255,0.7);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            padding: 20px;
+            padding-bottom: 100px;
+        }
+        .header {
+            text-align: center;
+            padding: 20px 0;
+            border-bottom: 2px solid var(--cagliari-red);
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            font-size: 24px;
+            background: linear-gradient(135deg, var(--cagliari-red), var(--cagliari-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .back-link {
+            display: inline-block;
+            color: var(--cagliari-red);
+            text-decoration: none;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+        .standings-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--bg-card);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        .standings-table th {
+            background: rgba(200,16,46,0.2);
+            padding: 12px 8px;
+            text-align: left;
+            font-size: 12px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+        }
+        .standings-table td {
+            padding: 12px 8px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            font-size: 14px;
+        }
+        .standings-table tr.cagliari {
+            background: rgba(200,16,46,0.15);
+            font-weight: 700;
+        }
+        .standings-table tr.champions {
+            border-left: 3px solid #00ff88;
+        }
+        .standings-table tr.europa {
+            border-left: 3px solid #ffaa00;
+        }
+        .standings-table tr.relegation {
+            border-left: 3px solid #ff3366;
+        }
+        .position {
+            font-weight: 700;
+            color: var(--text-secondary);
+            width: 30px;
+        }
+        .team-name {
+            flex: 1;
+        }
+        .points {
+            font-weight: 800;
+            color: var(--cagliari-red);
+            font-size: 16px;
+        }
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-secondary);
+        }
+        .cagliari-badge {
+            background: var(--cagliari-red);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            margin-left: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🏆 Classifica Serie A</h1>
+    </div>
+    
+    <a href="index.html" class="back-link">← Torna alla Home</a>
+    
+    <div id="standingsContainer">
+        <div class="loading">Caricamento classifica...</div>
+    </div>
+
+    <script>
+        const API_KEY = 'cdd1a87ea50a411880249e70138e0233';
+        const API_BASE = 'https://api.football-data.org/v4';
+        const SERIE_A_CODE = 'SA';
+        const CAGLIARI_ID = 115;
+
+        async function loadStandings() {
+            try {
+                const response = await fetch(`${API_BASE}/competitions/${SERIE_A_CODE}/standings`, {
+                    headers: { 'X-Auth-Token': API_KEY }
+                });
+                const data = await response.json();
+                
+                if (data.standings && data.standings[0]) {
+                    const table = data.standings[0].table;
+                    renderStandings(table);
+                }
+            } catch (error) {
+                document.getElementById('standingsContainer').innerHTML = '<div class="loading">Errore nel caricamento</div>';
+            }
+        }
+
+        function renderStandings(table) {
+            let html = '<table class="standings-table">';
+            html += '<tr><th>#</th><th>Squadra</th><th>G</th><th>V</th><th>P</th><th>S</th><th>Pt</th></tr>';
+            
+            table.forEach((team, index) => {
+                const position = index + 1;
+                const isCagliari = team.team.id === CAGLIARI_ID;
+                let rowClass = '';
+                
+                if (isCagliari) rowClass = 'cagliari';
+                else if (position <= 4) rowClass = 'champions';
+                else if (position <= 6) rowClass = 'europa';
+                else if (position >= 18) rowClass = 'relegation';
+                
+                html += `
+                    <tr class="${rowClass}">
+                        <td class="position">${position}</td>
+                        <td class="team-name">
+                            ${team.team.name}
+                            ${isCagliari ? '<span class="cagliari-badge">CAGLIARI</span>' : ''}
+                        </td>
+                        <td>${team.playedGames}</td>
+                        <td>${team.won}</td>
+                        <td>${team.draw}</td>
+                        <td>${team.lost}</td>
+                        <td class="points">${team.points}</td>
+                    </tr>
+                `;
+            });
+            
+            html += '</table>';
+            
+            html += '<div style="margin-top: 20px; font-size: 12px; color: var(--text-secondary);">';
+            html += '<div style="display: flex; gap: 16px; flex-wrap: wrap;">';
+            html += '<span style="display: flex; align-items: center; gap: 6px;"><span style="width: 10px; height: 10px; background: #00ff88; border-radius: 2px;"></span> Champions League</span>';
+            html += '<span style="display: flex; align-items: center; gap: 6px;"><span style="width: 10px; height: 10px; background: #ffaa00; border-radius: 2px;"></span> Europa League</span>';
+            html += '<span style="display: flex; align-items: center; gap: 6px;"><span style="width: 10px; height: 10px; background: #ff3366; border-radius: 2px;"></span> Retrocessione</span>';
+            html += '</div></div>';
+            
+            document.getElementById('standingsContainer').innerHTML = html;
+        }
+
+        loadStandings();
+        setInterval(loadStandings, 300000);
+    </script>
+</body>
+</html>
