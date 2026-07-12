@@ -1,4 +1,4 @@
-# 🔴🔵 Cagliari Tracker
+# <img src="https://upload.wikimedia.org/wikipedia/commons/9/9c/Cagliari_Calcio_1920.svg" alt="Cagliari" width="40" height="40" style="vertical-align: middle;"> Cagliari Tracker
 
 App per seguire tutte le partite del **Cagliari Calcio** in Serie A.
 
